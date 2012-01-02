@@ -11,6 +11,8 @@ import java.util.List;
 import com.mongodb.*;
 import com.mongodb.util.JSON;
 
+import static team_rocket.cross_world.commons.constants.Constants.Mongo.*;
+
 /**
  * A simple script-like tool for extracting words and clues from the crosswords of NY Times. 
  * The crossword puzzles are in the JSON format used by www.rosswords.info.
@@ -79,7 +81,7 @@ public class WordExtractor
     
     private static void initMongo() throws UnknownHostException, MongoException {
 		Mongo mongo = new Mongo();
-		wordsCollection = mongo.getDB("CrossWorld").getCollection("words");
-		wordsCollection.createIndex(new BasicDBObject("word", 1));
+		wordsCollection = mongo.getDB(DB_NAME).getCollection(DB_COLLECTION_WORDS);
+		wordsCollection.createIndex(new BasicDBObject(FIELD_WORDS_WORD, 1));
     }
 }
