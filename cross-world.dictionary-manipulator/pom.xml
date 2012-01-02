@@ -2,9 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>team-rocket</groupId>
 	<artifactId>cross-world.dictionary-manipulator</artifactId>
-	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>dictionary-manipulator</name>
@@ -31,4 +29,9 @@
 			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
+	<parent>
+		<groupId>team-rocket</groupId>
+		<artifactId>cross-world.parent</artifactId>
+		<version>1.0.0</version>
+	</parent>
 </project>
