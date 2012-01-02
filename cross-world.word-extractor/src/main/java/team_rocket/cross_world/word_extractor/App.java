@@ -22,7 +22,7 @@ public class App
     public static void main( String[] args ) throws IOException {
     	initMongo();
     	
-        File crosswordsDir = new File("../crosswords/nytimes");
+        File crosswordsDir = new File("../resources/crosswords/nytimes");
         File[] crosswordFiles = crosswordsDir.listFiles();
         
 		for (int i = 0; i < crosswordFiles.length; i++) {
