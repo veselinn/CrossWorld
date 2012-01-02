@@ -2,7 +2,7 @@ package team_rocket.cross_world.crossword_generator;
 
 import java.util.Map;
 
-import team_rocket.word_dictionary.WordDictionary;
+import team_rocket.cross_world.commons.data.WordDictionary;
 
 public class WordProvider {
 

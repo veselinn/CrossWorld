@@ -4,11 +4,10 @@
 
   <groupId>team-rocket</groupId>
   <artifactId>cross-world.word-extractor</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>cross-world.word-extractor</name>
-  <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

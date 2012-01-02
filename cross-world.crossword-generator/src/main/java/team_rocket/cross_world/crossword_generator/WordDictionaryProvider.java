@@ -3,7 +3,7 @@ package team_rocket.cross_world.crossword_generator;
 import java.net.UnknownHostException;
 import java.util.List;
 
-import team_rocket.word_dictionary.WordDictionary;
+import team_rocket.cross_world.commons.data.WordDictionary;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;

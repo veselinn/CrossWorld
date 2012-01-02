@@ -22,8 +22,8 @@
     </dependency>
     <dependency>
     	<groupId>team-rocket</groupId>
-    	<artifactId>cross-world.word-dictionary</artifactId>
-    	<version>0.0.1-SNAPSHOT</version>
+    	<artifactId>cross-world.commons</artifactId>
+    	<version>1.0.0</version>
     </dependency>
     <dependency>
 		<groupId>org.mongodb</groupId>
