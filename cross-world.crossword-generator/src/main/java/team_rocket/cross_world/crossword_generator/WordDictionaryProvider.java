@@ -12,15 +12,10 @@ import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
+import static team_rocket.cross_world.commons.constants.Constants.Mongo.*;
+import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
+
 public class WordDictionaryProvider {
-	private static final String DB_NAME = "CrossWorld";
-	private static String DB_COLLECTION_DICTIONARIES = "dictionaries";
-	
-	private static String FIELD_DICTIONARY_STRUCTURE = "structure";
-	private static String FIELD_DICTIONARY_WORD_SIZE = "wordLength";
-	
-	private static int ALPHABET_SIZE = 26;
-	
 	private DBCollection mDictionariesCollection;
 	
 	public WordDictionaryProvider() {

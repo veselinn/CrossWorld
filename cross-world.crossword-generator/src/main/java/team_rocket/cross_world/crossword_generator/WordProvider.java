@@ -4,13 +4,13 @@ import java.util.Map;
 
 import team_rocket.cross_world.commons.data.WordDictionary;
 
+import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
+
 public class WordProvider {
 
 	private WordDictionaryProvider dictionaryProvider;
 	private Map<Integer, WordDictionary> wordDictinaries;
 
-	private static int ALPHABET_SIZE = 26;
-	
 	public WordProvider(WordDictionaryProvider dictionaryProvider) {
 		this.dictionaryProvider = dictionaryProvider;
 	}
