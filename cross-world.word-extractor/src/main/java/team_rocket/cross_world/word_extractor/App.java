@@ -35,6 +35,8 @@ public class App
 				wordsCollection.update(query, modifier, true, false);
 			}
 		}
+		
+		System.out.println("Finished extracting words.");
     }
     
     private static String readFile(File crossword) throws IOException {
@@ -60,9 +62,14 @@ public class App
     	clues.addAll((BasicDBList)((DBObject)crossword.get("clues")).get("down"));
     	
     	for (int i = 0; i < answers.size(); i++) {
-    		BasicDBObject word = new BasicDBObject("word", ((String)answers.get(i)).toLowerCase());
-    		word.append("clue", ((String)clues.get(i)).substring(4));
-    		words.add(word);
+    		String answer = ((String)answers.get(i)).toLowerCase();
+    		String clue = (String)clues.get(i);
+    		clue = clue.replaceFirst("^[0-9]*\\.\\s*", "");
+    		if (answer.matches("[a-zA-Z]*")) {
+    			BasicDBObject word = new BasicDBObject("word", answer);
+    			word.append("clue", clue);
+    			words.add(word);    			
+    		}
 		}
     	
     	DBObject[] wordsArray = new DBObject[words.size()];
