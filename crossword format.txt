@@ -1,0 +1,16 @@
+answers: {
+	across: []
+	down: []
+}
+
+clues: {
+	across: []
+	down: []
+}
+
+grid: []
+gridnums: []
+size: {
+	cols:15,
+	rows:15
+}

@@ -1,8 +1,12 @@
-package team_rocket.cross_world.dictionary_manipulator;
+package team_rocket.cross_world.crossword_generator;
 
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import team_rocket.cross_world.commons.data.WordDictionary;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -16,43 +20,44 @@ import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
 
 public class WordDictionaryCreator {
 	private DBCollection mWordsCollection;
-	private DBCollection mDictionariesCollection;
-	
-	public static void main(String[] args) throws UnknownHostException, MongoException {
+	private HashMap<Integer, WordDictionary> dictionaries;
+
+	public static void main(String[] args) throws UnknownHostException,
+			MongoException {
 		WordDictionaryCreator wdc = new WordDictionaryCreator();
 		wdc.initializeDBConnection();
-		wdc.initializeDictionaries();
+		wdc.getDictionaries();
 	}
-	
-	public void initializeDictionaries() {
-		mDictionariesCollection.remove(new BasicDBObject());
+
+	public Map<Integer, boolean[][][]> getDictionaries() {
 		int allWordsCount = mWordsCollection.find().count();
 		int currentWordsCount = 0;
 		int wordsLength = 1;
-		while(currentWordsCount < allWordsCount) {
+		while (currentWordsCount < allWordsCount) {
 			int wordsCount = addWordDictionary(wordsLength++);
 			currentWordsCount += wordsCount;
 		}
 	}
-	
-	public int addWordDictionary(int wordLength) {
+
+	public WordDictionary getWordDictionary(int wordLength) {
 		List<DBObject> words = getWordsByLength(wordLength);
-		int wordsCount = words.size();
-		String[] wordString = new String[wordsCount];
-		for(int i = 0; i < wordsCount; i++){
-			DBObject word = words.get(i); 
+		String[] wordString = getWordStrings(words);
+		boolean dictionaryStructure =
+		return createDictionaryStructure(wordString);
+	}
+
+	private String[] getWordStrings(List<DBObject> words) {
+		String[] wordString = new String[words.size()];
+		for (int i = 0; i < words.size(); i++) {
+			DBObject word = words.get(i);
 			wordString[i] = (String) word.get(FIELD_WORDS_WORD);
 		}
-		boolean[][][] dictionaryStructure = createDictionaryStructure(wordString);
-		DBObject dbWordDictionary = new BasicDBObject();
-		dbWordDictionary.put(FIELD_DICTIONARY_WORD_SIZE, wordLength);
-		dbWordDictionary.put(FIELD_DICTIONARY_STRUCTURE, dictionaryStructure);
-		mDictionariesCollection.save(dbWordDictionary);
-		return wordsCount; 
+		return wordString;
 	}
 	
 	private List<DBObject> getWordsByLength(int wordLength) {
-		DBObject wordQuery = new BasicDBObject(FIELD_WORDS_WORD, Pattern.compile("^.{" + wordLength + "}$"));
+		DBObject wordQuery = new BasicDBObject(FIELD_WORDS_WORD,
+				Pattern.compile("^.{" + wordLength + "}$"));
 		DBObject keysQuery = new BasicDBObject(FIELD_WORDS_WORD, 1);
 		return mWordsCollection.find(wordQuery, keysQuery).toArray();
 	}
@@ -60,23 +65,23 @@ public class WordDictionaryCreator {
 	private boolean[][][] createDictionaryStructure(String[] words) {
 		int wordLength = words.length != 0 ? words[0].length() : 0;
 		boolean[][][] dictionary = new boolean[wordLength][ALPHABET_SIZE][words.length];
-		for(int i = 0; i < words.length; i++){
-			for(int j = 0; j < wordLength; j++){
+		for (int i = 0; i < words.length; i++) {
+			for (int j = 0; j < wordLength; j++) {
 				int letterIndex = getAlphabetIndex(words[i].charAt(j));
 				dictionary[j][letterIndex][i] = true;
 			}
 		}
 		return dictionary;
 	}
-	
+
 	private int getAlphabetIndex(char charAt) {
 		return charAt - 'a';
 	}
 
-	private void initializeDBConnection() throws UnknownHostException, MongoException {
+	private void initializeDBConnection() throws UnknownHostException,
+			MongoException {
 		Mongo mongo = new Mongo();
 		DB crossWorld = mongo.getDB(DB_NAME);
 		mWordsCollection = crossWorld.getCollection(DB_COLLECTION_WORDS);
-		mDictionariesCollection = crossWorld.getCollection(DB_COLLECTION_DICTIONARIES);
 	}
 }
