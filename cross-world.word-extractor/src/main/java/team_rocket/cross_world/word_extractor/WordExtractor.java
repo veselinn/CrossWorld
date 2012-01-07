@@ -15,7 +15,7 @@ import static team_rocket.cross_world.commons.constants.Constants.Mongo.*;
 
 /**
  * A simple script-like tool for extracting words and clues from the crosswords of NY Times. 
- * The crossword puzzles are in the JSON format used by www.rosswords.info.
+ * The crossword puzzles are in the JSON format used by www.crosswords.info.
  */
 public class WordExtractor 
 {
@@ -32,8 +32,8 @@ public class WordExtractor
 			DBObject[] words = getWords(crossword);
 			for (int j = 0; j < words.length; j++) {
 				DBObject modifier = new BasicDBObject("$addToSet", 
-						new BasicDBObject("clues", words[j].get("clue")));
-				DBObject query = new BasicDBObject("word", words[j].get("word"));
+						new BasicDBObject(FIELD_WORDS_CLUES, words[j].get("clue")));
+				DBObject query = new BasicDBObject(FIELD_WORDS_WORD, words[j].get("word"));
 				wordsCollection.update(query, modifier, true, false);
 			}
 		}

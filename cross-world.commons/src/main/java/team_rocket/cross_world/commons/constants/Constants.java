@@ -10,6 +10,7 @@ public class Constants {
 		public static final String DB_COLLECTION_DICTIONARIES = "dictionaries";
 		
 		public static final String FIELD_WORDS_WORD = "word";
+		public static final String FIELD_WORDS_CLUES = "clues";
 		public static final String FIELD_DICTIONARY_STRUCTURE = "structure";
 		public static final String FIELD_DICTIONARY_WORD_SIZE = "wordLength";
 	}
