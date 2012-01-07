@@ -1,0 +1,14 @@
+.pageContainer {
+	border: 1px solid blue;
+	margin: 50px auto;
+	width: 70%;
+	height: 80%;
+	
+	min-width: 400px;
+	min-height: 500px;
+}
+
+.crosswordContainer {
+	margin: 50px auto;
+	border: 1px solid green;
+}

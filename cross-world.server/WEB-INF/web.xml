@@ -5,13 +5,13 @@
      version="2.5">
      	
 	<servlet>
-		<servlet-name>static-servlet</servlet-name>
-		<servlet-class>team_rocket.cross_world.server.EchoServlet</servlet-class>
+		<servlet-name>crossword-servlet</servlet-name>
+		<servlet-class>team_rocket.cross_world.server.CrosswordServlet</servlet-class>
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>static-servlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<servlet-name>crossword-servlet</servlet-name>
+		<url-pattern>/crossword/</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>   
