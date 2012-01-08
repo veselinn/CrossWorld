@@ -20,30 +20,47 @@ import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
 
 public class WordDictionaryCreator {
 	private DBCollection mWordsCollection;
-	private HashMap<Integer, WordDictionary> dictionaries;
 
 	public static void main(String[] args) throws UnknownHostException,
 			MongoException {
 		WordDictionaryCreator wdc = new WordDictionaryCreator();
 		wdc.initializeDBConnection();
-		wdc.getDictionaries();
+		Map<Integer, WordDictionary> dictionaries = wdc.getDictionaries();
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 26; j++) {
+				if(dictionaries.get(4).getWordMapping(i, j)[123] == true) {
+					char currentCh = (char) ('a' + j);
+					System.out.println("letter " + currentCh);
+				}
+			}
+		}
+
+		System.out.println(dictionaries.get(4).getWordMapping(0, 0).length);
 	}
 
-	public Map<Integer, boolean[][][]> getDictionaries() {
+	public Map<Integer, WordDictionary> getDictionaries() {
+		Map<Integer, WordDictionary> dictionaries = new HashMap<Integer, WordDictionary>();
 		int allWordsCount = mWordsCollection.find().count();
 		int currentWordsCount = 0;
 		int wordsLength = 1;
 		while (currentWordsCount < allWordsCount) {
-			int wordsCount = addWordDictionary(wordsLength++);
+			WordDictionary dictionary = getWordDictionary(wordsLength);
+			int wordsCount = dictionary.getWordMapping(0, 0).length;
 			currentWordsCount += wordsCount;
+			if (wordsCount > 0) {
+				dictionaries.put(wordsLength, dictionary);
+			}
+			wordsLength++;
 		}
+		return dictionaries;
 	}
 
 	public WordDictionary getWordDictionary(int wordLength) {
 		List<DBObject> words = getWordsByLength(wordLength);
-		String[] wordString = getWordStrings(words);
-		boolean dictionaryStructure =
-		return createDictionaryStructure(wordString);
+		String[] wordStrings = getWordStrings(words);
+		boolean[][][] dictionaryStructure = createDictionaryStructure(
+				wordStrings, wordLength);
+		return new WordDictionary(dictionaryStructure);
 	}
 
 	private String[] getWordStrings(List<DBObject> words) {
@@ -54,7 +71,7 @@ public class WordDictionaryCreator {
 		}
 		return wordString;
 	}
-	
+
 	private List<DBObject> getWordsByLength(int wordLength) {
 		DBObject wordQuery = new BasicDBObject(FIELD_WORDS_WORD,
 				Pattern.compile("^.{" + wordLength + "}$"));
@@ -62,8 +79,8 @@ public class WordDictionaryCreator {
 		return mWordsCollection.find(wordQuery, keysQuery).toArray();
 	}
 
-	private boolean[][][] createDictionaryStructure(String[] words) {
-		int wordLength = words.length != 0 ? words[0].length() : 0;
+	private boolean[][][] createDictionaryStructure(String[] words,
+			int wordLength) {
 		boolean[][][] dictionary = new boolean[wordLength][ALPHABET_SIZE][words.length];
 		for (int i = 0; i < words.length; i++) {
 			for (int j = 0; j < wordLength; j++) {
