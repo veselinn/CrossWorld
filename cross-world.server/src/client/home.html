@@ -6,15 +6,42 @@
 		
 		<link rel="stylesheet" media="screen" type="text/css" href="css/home.css">
 		<link rel="stylesheet" media="screen" type="text/css" href="css/crossword.css">
+		<link rel="stylesheet" media="screen" type="text/css" href="script/lib/jquery-ui/css/ui-lightness/jquery-ui-1.8.16.custom.css">
 		
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+		<script src="script/lib/jquery-ui/js/jquery-ui-1.8.16.custom.min.js" type="text/javascript"></script>
 		<script src="script/lib/mustache.js" type="text/javascript" ></script>
-		<script src="script/home.js" type="text/javascript" ></script>
 		<script src="script/templates/crossword.js" type="text/javascript" ></script>
+		<script src="script/crosswordTemplates.js" type="text/javascript" ></script>
+		<script src="script/home.js" type="text/javascript" ></script>
 	</head>
 	<body>
 		<div class="pageContainer">
-			<div class="crosswordContainer"></div>
+			<div id="crosswordTabs">
+				<ul>
+					<li><a href="#crosswordTemplatesTab">Choose a grid</a></li>
+					<li><a href="#generatingCrosswordTab">Generating crossword</a></li>
+					<li><a href="#generatedCrosswordTab">Generated crossword</a></li>
+				</ul>
+				<div id="crosswordTemplatesTab">
+					<p>
+						Select a crossword template to be filled.
+					</p>
+					<div class="crosswordsContainer">				
+					</div>
+				</div>
+				<div id="generatingCrosswordTab">
+					<p>Your crossword is being generated. It could take a while.</p>
+					<div class="loader">		
+					</div>
+				</div>
+				<div id="generatedCrosswordTab">
+					<p>Your crossword has been generated.</p>
+					<div class="crosswordContainer">						
+					</div>
+					<button id="backButton">Choose another</button>
+				</div>
+			</div>
 		</div>
 	</body>
 </html>

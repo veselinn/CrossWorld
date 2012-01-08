@@ -9,5 +9,6 @@ CW.Templates.crossword = {
 			'	{{^blank}}' +
 			'	<div class="fullCell">{{letter}}</div>' +
 			'	{{/blank}}' +
-			'</div>'
+			'</div>',
+	clearfix: '<div style="clear: both;">'
 }

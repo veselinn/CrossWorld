@@ -1,14 +1,49 @@
 .pageContainer {
 	border: 1px solid blue;
 	margin: 50px auto;
-	width: 70%;
-	height: 80%;
+	padding: 20px 10px;
 	
-	min-width: 400px;
-	min-height: 500px;
+	width: 550px;
+	height: 700px;
+	
+	font: 12px Verdana;
+	overflow: visible;
+}
+
+#crosswordTemplatesTab .crosswordsContainer {
+	margin-top: 20px;
+	border: 1px solid green;
+	
+	height: 500px;
+	overflow-x: hidden;
 }
 
 .crosswordContainer {
-	margin: 50px auto;
-	border: 1px solid green;
+	background-color: white;	
+}
+
+#crosswordTemplatesTab .crosswordContainer {
+	margin: 10px auto;
+	cursor: pointer;
+}
+
+.hovered {
+	box-shadow: 0 0 2px 2px #888;
+	background-color: #e6ffe1;	
+}
+
+.loader {
+	margin: 10px auto;
+	background-image: url("../images/ajax-loader.gif");
+	width: 32px;
+	height: 16px;
+}
+
+#generatedCrosswordTab .crosswordContainer {
+	margin: 0 auto;
+}
+
+html, page {
+	width: 100%;
+	height: 100%;
 }

@@ -19,9 +19,13 @@ public class CrosswordServlet extends HttpServlet
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException
     {
-		resp.addHeader("Content-Type", "application/json");
+		String[] blankCellsParams = req.getParameterValues("blankCells[]");
+		int[] blankCells = new int[blankCellsParams.length];
+		for (int i = 0; i < blankCellsParams.length; i++) {
+			blankCells[i] = Integer.parseInt(blankCellsParams[i]);
+		}
 		
-		//Stub data. To be replaced with a call to crossword generating service.
+		//Stub data. To be replaced with a call to a crossword generating service.
     	Crossword crossworld = new Crossword();
     	crossworld.setCols(3);
     	crossworld.setRows(3);
@@ -34,6 +38,7 @@ public class CrosswordServlet extends HttpServlet
     	crossworld.setCluesAcross(new String[] {"1. A finger.", "6. Automobile."});
     	crossworld.setCluesDown(new String[] {"1. Tic ____.", "3. Part of head."});
     	
+    	resp.addHeader("Content-Type", "application/json");
     	ObjectMapper mapper = new ObjectMapper();
     	Writer writer = resp.getWriter();
     	writer.write(mapper.writeValueAsString(crossworld));
