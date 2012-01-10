@@ -11,13 +11,12 @@ import team_rocket.cross_world.commons.data.WordDictionary;
 import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
 
 public class WordProvider {
-
-	private WordDictionaryProvider dictionaryProvider;
+	private WordDictionaryCreator dictionaryCreator;
 	private Map<Integer, WordDictionary> wordDictinaries;
 	private boolean isInitialized;
 
-	public WordProvider(WordDictionaryProvider dictionaryProvider) {
-		this.dictionaryProvider = dictionaryProvider;
+	public WordProvider(WordDictionaryCreator dictionaryProvider) {
+		this.dictionaryCreator = dictionaryProvider;
 		this.wordDictinaries = new HashMap<Integer, WordDictionary>();
 		this.isInitialized = false;
 	}
@@ -38,7 +37,7 @@ public class WordProvider {
 		return new String(wordChars);
 	}
 
-	public void intersect(boolean[] availableWord, int wordLength,
+	public boolean[] intersect(boolean[] availableWord, int wordLength,
 			int letterIndex, int letter) throws UnknownHostException, MongoException {
 		boolean[] words = getStoredDictionary(wordLength).getWordMapping(
 				letterIndex, letter);
@@ -49,22 +48,23 @@ public class WordProvider {
 		for (int i = 0; i < availableWord.length; i++) {
 			availableWord[i] = availableWord[i] && words[i];
  		}
+		
+		return availableWord;
 	}
 
 	public int getWordCount(int wordLength) throws UnknownHostException, MongoException {
-		return getStoredDictionary(wordLength).getWordMapping(0, 0).length;
+		WordDictionary dictionary = getStoredDictionary(wordLength);
+		if(dictionary == null) {
+			return 0;
+		}
+		return dictionary.getWordMapping(0, 0).length;
 	}
 
 	private WordDictionary getStoredDictionary(int wordLength) throws UnknownHostException, MongoException {
-		WordDictionary dictionary = wordDictinaries.get(wordLength);
-		if (dictionary == null) {
-			if (!this.isInitialized) {
-				dictionaryProvider.initializeDBConnection();
-				this.isInitialized = true;
-			}
-			dictionary = dictionaryProvider.getWordDictionary(wordLength);
-			wordDictinaries.put(wordLength, dictionary);
+		if(!isInitialized) {
+			wordDictinaries = dictionaryCreator.getDictionaries();
+			isInitialized = true;
 		}
-		return dictionary;
+		return wordDictinaries.get(wordLength);
 	}
 }

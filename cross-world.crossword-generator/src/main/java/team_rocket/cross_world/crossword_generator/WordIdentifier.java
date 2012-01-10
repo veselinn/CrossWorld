@@ -9,6 +9,14 @@ public class WordIdentifier {
 		this.isAcross = isAcross;
 	}
 	
+	public int getWordNumber() {
+		return wordNumber;
+	}
+
+	public boolean isAcross() {
+		return isAcross;
+	}
+
 	@Override
 	public int hashCode() {
 		if (isAcross) {

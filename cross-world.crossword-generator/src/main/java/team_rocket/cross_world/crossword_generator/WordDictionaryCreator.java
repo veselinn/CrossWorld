@@ -20,11 +20,11 @@ import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
 
 public class WordDictionaryCreator {
 	private DBCollection mWordsCollection;
-
+	private boolean dbInitialized;
+	
 	public static void main(String[] args) throws UnknownHostException,
 			MongoException {
 		WordDictionaryCreator wdc = new WordDictionaryCreator();
-		wdc.initializeDBConnection();
 		Map<Integer, WordDictionary> dictionaries = wdc.getDictionaries();
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 26; j++) {
@@ -38,7 +38,11 @@ public class WordDictionaryCreator {
 		System.out.println(dictionaries.get(4).getWordMapping(0, 0).length);
 	}
 
-	public Map<Integer, WordDictionary> getDictionaries() {
+	public Map<Integer, WordDictionary> getDictionaries() throws UnknownHostException, MongoException {
+		if(!dbInitialized) {
+			initializeDBConnection();
+			dbInitialized = true;
+		}
 		Map<Integer, WordDictionary> dictionaries = new HashMap<Integer, WordDictionary>();
 		int allWordsCount = mWordsCollection.find().count();
 		int currentWordsCount = 0;
@@ -55,7 +59,7 @@ public class WordDictionaryCreator {
 		return dictionaries;
 	}
 
-	public WordDictionary getWordDictionary(int wordLength) {
+	private WordDictionary getWordDictionary(int wordLength) throws UnknownHostException, MongoException {
 		List<DBObject> words = getWordsByLength(wordLength);
 		String[] wordStrings = getWordStrings(words);
 		boolean[][][] dictionaryStructure = createDictionaryStructure(
@@ -72,7 +76,7 @@ public class WordDictionaryCreator {
 		return wordString;
 	}
 
-	private List<DBObject> getWordsByLength(int wordLength) {
+	private List<DBObject> getWordsByLength(int wordLength) throws UnknownHostException, MongoException {
 		DBObject wordQuery = new BasicDBObject(FIELD_WORDS_WORD,
 				Pattern.compile("^.{" + wordLength + "}$"));
 		DBObject keysQuery = new BasicDBObject(FIELD_WORDS_WORD, 1);
