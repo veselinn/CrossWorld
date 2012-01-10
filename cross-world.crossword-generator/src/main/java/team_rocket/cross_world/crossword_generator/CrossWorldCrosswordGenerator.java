@@ -27,11 +27,11 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 				new WordProvider(new WordDictionaryCreator()));
 		// cwcg.generateCrossword(3, 5, new int[] { 3, 4, 5, 6, 10, 11, });
 		// cwcg.generateCrossword(3, 3, new int[] {});
-		// cwcg.generateCrossword(5, 5, new int[] {});
-		cwcg.generateCrossword(9, 9, new int[] { 0, 1, 2, 6, 7, 8, 9, 10, 16,
-				17, 18, 26, 31, 39, 40, 41, 49, 54, 62, 63, 64, 70, 71, 72, 73,
-				74, 78, 79, 80 });
-		
+		//cwcg.generateCrossword(5, 5, new int[] {});
+		 cwcg.generateCrossword(9, 9, new int[] { 0, 1, 2, 6, 7, 8, 9, 10, 16,
+		 17, 18, 26, 31, 39, 40, 41, 49, 54, 62, 63, 64, 70, 71, 72, 73,
+		 74, 78, 79, 80 });
+
 	}
 
 	public CrossWorldCrosswordGenerator(WordProvider wordProvider) {
@@ -42,31 +42,31 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 			throws Exception {
 		Map<WordIdentifier, WordState> initialState = generateStartingState(
 				cols, rows, blanks);
-		// for (Entry<WordIdentifier, WordState> wordState :
-		// initialState.entrySet()) {
-		// System.out.println("Word number: "
-		// + wordState.getKey().getWordNumber() + ", Is acrossed: "
-		// + wordState.getKey().isAcross() + ", WordLength "
-		// + wordState.getValue().getWordLength());
-		// for (WordIdentifier crossWordId : wordState.getValue()
-		// .getCrossedWords()) {
-		// System.out.println("    Is acrossed: " + crossWordId.isAcross()
-		// + " Word number: " + crossWordId.getWordNumber());
-		// }
-		// }
 		Map<WordIdentifier, WordState> crossword = generateCrossword(initialState);
-		printStuff(crossword);
+		printState(crossword);
 		return null;
 	}
 
-	private void printStuff(Map<WordIdentifier, WordState> state)
+	private void printState(Map<WordIdentifier, WordState> state)
 			throws UnknownHostException, MongoException {
-		for (WordState wordState : state.values()) {
-			boolean[] availableWords = wordState.getAvailableWords();
-			int i = 0;
-			while (!availableWords[i++])
-				;
-			i--;
+		for (Entry<WordIdentifier, WordState> wordEntry : state.entrySet()) {
+			int chosenWordIndex = 0;
+			for (int i = 0; i < wordEntry.getValue().getAvailableWords().length; i++) {
+				if (wordEntry.getValue().getAvailableWords()[i]) {
+					chosenWordIndex = i;
+					break;
+				}
+			}
+
+			System.out.println("Word number: "
+					+ wordEntry.getKey().getWordNumber()
+					+ ", Is acrossed: "
+					+ wordEntry.getKey().isAcross()
+					+ ", Word: "
+					+ wordProvider.getWord(
+							wordEntry.getValue().getWordLength(),
+							chosenWordIndex));
+
 		}
 	}
 
@@ -106,7 +106,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	}
 
 	/**
-	 * Returns the best word match as string or null, if none is found.
+	 * Returns the best word match as int or -1, if none is found.
 	 * 
 	 * @param wordState
 	 * @param state
@@ -120,8 +120,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		int wordCount = Math.min(wordState.getNumberOfChoice(), 10);
 		boolean[] avalableWords = wordState.getAvailableWords();
 		if (preconditions != null) {
-			boolean hasAnyWWords = substract(preconditions, avalableWords);
-			if (!hasAnyWWords) {
+			boolean hasAnyWords = substract(preconditions, avalableWords);
+			if (!hasAnyWords) {
 				return -1;
 			}
 			avalableWords = preconditions;
@@ -226,104 +226,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		return chosenWordIndexes;
 	}
 
-	private WordState getNextState(Map<WordIdentifier, WordState> state)
-			throws UnknownHostException, MongoException {
-
-		System.out.println();
-		WordState wordState = getMostConstrainedWordState(state.values());
-
-		if (wordState == null) {
-			return null;
-		}
-
-		System.out.println("Processing " + wordState.getId().getWordNumber()
-				+ ", " + (wordState.getId().isAcross() ? "across" : "down"));
-
-		// get best word match (intelligent instantiation)
-		int bestWordIndex = getBestWordMatch(wordState, state, null);
-		if (bestWordIndex == -1) {
-			return wordState;
-		}
-		String word = wordProvider.getWord(wordState.getWordLength(),
-				bestWordIndex);
-		System.out.println("Chose : " + word);
-		// modify state
-		boolean[] availableWords = wordState.getAvailableWords();
-		boolean[] oldAvailableWords = availableWords.clone();
-		for (int i = 0; i < availableWords.length; i++) {
-			if (i != bestWordIndex) {
-				availableWords[i] = false;
-			}
-		}
-		wordState.setAvailableWords(availableWords);
-		wordState.setProcessed(true);
-
-		// change crossed states
-		boolean[][] oldCrossedWordStates = new boolean[wordState
-				.getWordLength()][wordState.getAvailableWords().length];
-		for (int i = 0; i < wordState.getCrossedWords().size(); i++) {
-			Entry<WordIdentifier, Integer> crossedWordEntry = wordState
-					.getCrossedWords().get(i);
-			if (crossedWordEntry == null) {
-				continue;
-			}// TODO if is processed dont do that
-			WordState crossedWordState = state.get(crossedWordEntry.getKey());
-			oldCrossedWordStates[i] = crossedWordState.getAvailableWords()
-					.clone();
-			boolean[] crossedState = crossedWordState.getAvailableWords();
-			wordProvider.intersect(crossedState,
-					crossedWordState.getWordLength(),
-					crossedWordEntry.getValue(), word.charAt(i) - 'a');
-			crossedWordState.setAvailableWords(crossedState);
-			System.out.println("Choise for crossed word "
-					+ crossedWordState.getId().getWordNumber() + ", "
-					+ (crossedWordState.getId().isAcross() ? "across" : "down")
-					+ ", " + (crossedWordState.isProcessed() ? "" : "not ")
-					+ "processed" + " - "
-					+ crossedWordState.getNumberOfChoice());
-		}
-
-		// handle backtrack
-		WordState nextState = getNextState(state);
-		while (nextState != null) {
-			System.out.println("Backtracking.");
-			availableWords = null;
-			// revert state
-			wordState.setAvailableWords(oldAvailableWords);
-			wordState.setProcessed(false);
-			int i = 0;
-			for (Entry<WordIdentifier, Integer> crossedWordEntry : wordState
-					.getCrossedWords()) {
-				if (crossedWordEntry == null) {
-					continue;
-				}
-				state.get(crossedWordEntry.getKey()).setAvailableWords(
-						oldCrossedWordStates[i++]);
-			}
-			// continue
-
-			boolean isCrossed = false;
-			for (Entry<WordIdentifier, Integer> crossedWordEntry : wordState
-					.getCrossedWords()) {
-				if (crossedWordEntry == null) {
-					continue;
-				}
-				if (crossedWordEntry.getKey().equals(nextState.getId())) {
-					nextState = getNextState(state);
-					isCrossed = true;
-					break;
-				}
-			}
-			if (!isCrossed) {
-				return nextState;
-			}
-		}
-		return null;
-	}
-
 	private boolean getFinalState(Map<WordIdentifier, WordState> wordStateMap)
 			throws UnknownHostException, MongoException {
-		String word = null;
 		WordState wordState = null;
 		Deque<CrosswordState> crosswordStates = new LinkedList<CrosswordState>();
 		boolean[] preconditions = null;
@@ -345,12 +249,13 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 					preconditions);
 			preconditions = null;
 			if (bestWordIndex != -1) {
-				word = wordProvider.getWord(wordState.getWordLength(),
+				String word = wordProvider.getWord(wordState.getWordLength(),
 						bestWordIndex);
 				CrosswordState crosswordState = getCurrentState(wordStateMap,
-						wordState);
-				changeCurrentState(wordStateMap, wordState, bestWordIndex, word);
+						wordState, word);
 				crosswordStates.addLast(crosswordState);
+				
+				changeCurrentState(wordStateMap, wordState, bestWordIndex, word);
 				wordState = null;
 			} else {
 				CrosswordState crosswordState;
@@ -360,8 +265,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 					crosswordState = crosswordStates.removeLast();
 					backtrackedStates.add(crosswordState);
 					revertState(wordStateMap, crosswordState);
-				} while (getCrossedIndex(wordState, crosswordState.wordState) != -1);
-				preconditions = getPreconditions(backtrackedStates, word);
+				} while (getCrossedIndex(wordState, crosswordState.wordState) == -1);
+				preconditions = getPreconditions(backtrackedStates, wordState);
 				wordState = crosswordState.wordState;
 			}
 		} while (!crosswordStates.isEmpty());
@@ -369,9 +274,13 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	}
 
 	private boolean[] getPreconditions(List<CrosswordState> backtrackedStates,
-			String word) throws UnknownHostException, MongoException {
+			WordState brokenWordState) throws UnknownHostException,
+			MongoException {
+		System.out.println("Calculating preconditions.");
 		CrosswordState lastState = backtrackedStates.remove(backtrackedStates
 				.size() - 1);
+		String word = lastState.word;
+
 		boolean[] preconditions = new boolean[lastState.wordState
 				.getAvailableWords().length];
 		for (int i = 0; i < preconditions.length; i++) {
@@ -385,17 +294,29 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 						word.charAt(index) - 'a');
 			}
 		}
+		int brokenWordIndex = getCrossedIndex(lastState.wordState,
+				brokenWordState);
+		wordProvider.intersect(preconditions, word.length(), brokenWordIndex,
+				word.charAt(brokenWordIndex) - 'a');
 		return preconditions;
 	}
 
 	private int getCrossedIndex(WordState wordState, WordState otherWordState) {
 		int i = 0;
+
+		System.out.println("Checking if " + wordState.getId().getWordNumber()
+				+ ", " + (wordState.getId().isAcross() ? "across" : "down")
+				+ " and " + otherWordState.getId().getWordNumber() + ", "
+				+ (otherWordState.getId().isAcross() ? "across" : "down")
+				+ " are crossing");
+
 		for (Entry<WordIdentifier, Integer> crossedWordEntry : wordState
 				.getCrossedWords()) {
 			if (crossedWordEntry == null) {
 				continue;
 			}
 			if (crossedWordEntry.getKey().equals(otherWordState.getId())) {
+				System.out.println("Crossed.");
 				return i;
 			}
 			i++;
@@ -407,7 +328,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 			CrosswordState crosswordState) {
 		WordState wordState = crosswordState.wordState;
 		wordState.setAvailableWords(crosswordState.oldAvailableWords);
-		wordState.setProcessed(false);
+		wordState.setWord(null);
 		int i = 0;
 		for (Entry<WordIdentifier, Integer> crossedWordEntry : wordState
 				.getCrossedWords()) {
@@ -422,8 +343,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 
 	private void changeCurrentState(
 			Map<WordIdentifier, WordState> wordStateMap, WordState wordState,
-			int bestWordIndex, String word) throws UnknownHostException,
-			MongoException {
+			int bestWordIndex, String word) throws UnknownHostException, MongoException {
+
 		System.out.println("Chose : " + word);
 
 		boolean[] availableWords = wordState.getAvailableWords();
@@ -433,8 +354,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 			}
 		}
 		wordState.setAvailableWords(availableWords);
-		wordState.setProcessed(true);
-
+		wordState.setWord(word);
+		
 		// change crossed states
 		for (int i = 0; i < wordState.getCrossedWords().size(); i++) {
 			Entry<WordIdentifier, Integer> crossedWordEntry = wordState
@@ -459,7 +380,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	}
 
 	private CrosswordState getCurrentState(
-			Map<WordIdentifier, WordState> wordStateMap, WordState wordState) {
+			Map<WordIdentifier, WordState> wordStateMap, WordState wordState, String word) {
 		boolean[] oldAvailableWords = wordState.getAvailableWords().clone();
 		boolean[][] oldCrossedWordStates = new boolean[wordState
 				.getWordLength()][wordState.getAvailableWords().length];
@@ -479,6 +400,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		crosswordState.oldAvailableWords = oldAvailableWords;
 		crosswordState.oldCrossedWordStates = oldCrossedWordStates;
 		crosswordState.wordState = wordState;
+		crosswordState.word = word;
 		return crosswordState;
 	}
 
@@ -618,6 +540,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 
 }

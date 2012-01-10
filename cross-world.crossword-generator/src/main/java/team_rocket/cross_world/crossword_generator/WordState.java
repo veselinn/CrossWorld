@@ -26,22 +26,28 @@ public class WordState {
 	 */
 	private int numberOfChoice;
 	/**
-	 * Indicates if the {@link WordState} has been processed, i.e. if a word has
-	 * been already chosen.
-	 */
-	private boolean isProcessed;
-	/**
 	 * The id of the word state
 	 */
 	private WordIdentifier id;
+	/**
+	 * Keeps the word.
+	 */
+	private String word;
 	
+	public String getWord() {
+		return word;
+	}
+
+	public void setWord(String word) {
+		this.word = word;
+	}
+
 	public WordState(WordIdentifier id, int wordLength,
 			List<Entry<WordIdentifier, Integer>> crossedWords,
 			int availableWordsCount) {
 		this.id = id;
 		this.wordLength = wordLength;
 		this.crossedWords = crossedWords;
-		this.isProcessed = false;
 		this.availableWords = new boolean[availableWordsCount];
 		for (int i = 0; i < availableWordsCount; i++) {
 			this.availableWords[i] = true;
@@ -71,11 +77,7 @@ public class WordState {
 	}
 
 	public boolean isProcessed() {
-		return isProcessed;
-	}
-
-	public void setProcessed(boolean isProcessed) {
-		this.isProcessed = isProcessed;
+		return word != null;
 	}
 
 	private void countNumberOfChoice() {
