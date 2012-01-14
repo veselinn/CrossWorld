@@ -1,6 +1,7 @@
 package team_rocket.cross_world.crossword_generator;
 
 import java.net.UnknownHostException;
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
@@ -9,7 +10,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -20,17 +20,45 @@ import com.mongodb.MongoException;
 
 public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 
+	// private static Logger logger = Logger
+	// .getLogger(CrossWorldCrosswordGenerator.class);
+
 	private WordProvider wordProvider;
 
 	public static void main(String[] args) throws Exception {
+		// BasicConfigurator.configure();
+		// logger.addAppender(new FileAppender(new SimpleLayout(),
+		// "/crossword-generator.log"));
+		// logger.addAppender(new ConsoleAppender(new SimpleLayout()));
+
 		CrossWorldCrosswordGenerator cwcg = new CrossWorldCrosswordGenerator(
 				new WordProvider(new WordDictionaryCreator()));
 		// cwcg.generateCrossword(3, 5, new int[] { 3, 4, 5, 6, 10, 11, });
 		// cwcg.generateCrossword(3, 3, new int[] {});
-		//cwcg.generateCrossword(5, 5, new int[] {});
-		 cwcg.generateCrossword(9, 9, new int[] { 0, 1, 2, 6, 7, 8, 9, 10, 16,
-		 17, 18, 26, 31, 39, 40, 41, 49, 54, 62, 63, 64, 70, 71, 72, 73,
-		 74, 78, 79, 80 });
+		// cwcg.generateCrossword(5, 5, new int[] {});
+//		cwcg.generateCrossword(9, 9, new int[] { 0, 1, 2, 6, 7, 8, 9, 10, 16,
+//				17, 18, 26, 31, 39, 40, 41, 49, 54, 62, 63, 64, 70, 71, 72, 73,
+//				74, 78, 79, 80 });
+//		cwcg.generateCrossword(13, 13, new int[] {
+//				4, 17, 30, 134, 147, 160, 8, 21, 34, 138, 151, 164,
+//				52, 53, 54, 62, 63, 64, 104, 105, 106, 114, 115, 116,
+//				45,
+//				58,
+//				70, 71, 72,
+//				81, 82, 83, 84, 85, 86, 87, 
+//				96, 97, 98,
+//				110,
+//				123
+//		});
+		cwcg.generateCrossword(13, 13, new int[] {
+				4, 17, 30, 134, 147, 160, 8, 21, 34, 138, 151, 164,
+				52, 53, 54, 62, 63, 64, 104, 105, 106, 114, 115, 116,
+				58,
+				70, 71, 72,
+				82, 83, 84, 85, 86, 
+				96, 97, 98,
+				110
+		});
 
 	}
 
@@ -66,7 +94,6 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 					+ wordProvider.getWord(
 							wordEntry.getValue().getWordLength(),
 							chosenWordIndex));
-
 		}
 	}
 
@@ -117,6 +144,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	private int getBestWordMatch(WordState wordState,
 			Map<WordIdentifier, WordState> state, boolean[] preconditions)
 			throws UnknownHostException, MongoException {
+		//TODO: extract 10
 		int wordCount = Math.min(wordState.getNumberOfChoice(), 10);
 		boolean[] avalableWords = wordState.getAvailableWords();
 		if (preconditions != null) {
@@ -225,10 +253,64 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		}
 		return chosenWordIndexes;
 	}
+	
+	/**
+	 * Creates a starting grid and lists for the starting positions of the words. 
+	 * <code>crosswordField</code> must contain 0 in every cell that is considered free and -1 for 
+	 * every unavailable("blank") cell.
+	 * Modifies <code>crosswordField</code> to contain the starting grid, <code>acrossWords</code> and 
+	 * <code>downWords</code> to contain the start index and position of the across words and down 
+	 * words. 
+	 * 
+	 * @param crosswordField
+	 * @param acrossWords
+	 * @param downWords
+	 */
+	public static void createStartingGrid(int[][] crosswordField, List<int[]> acrossWords,
+			List<int[]> downWords) {
+		int wordIndex = 1;
+		int rows = crosswordField.length;
+		int cols = crosswordField[0].length;
+		
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (crosswordField[i][j] != -1) {
+					boolean isWordStart = false;
+					if ((i == 0) || (crosswordField[i - 1][j] == -1)) {
+						int k = 0;
+						while ((k + i) < rows && crosswordField[i + k][j] != -1) {
+							k++;
+						}
+						if (k > 2) {
+							downWords.add(new int[] { wordIndex, i, j });
+							isWordStart = true;
+						}
+					}
 
+					if ((j == 0) || (crosswordField[i][j - 1] == -1)) {
+						int k = 0;
+						while ((j + k) < cols && crosswordField[i][j + k] != -1) {
+							k++;
+						}
+						if (k > 2) {
+							acrossWords.add(new int[] { wordIndex, i, j });
+							isWordStart = true;
+						}
+					}
+
+					if (isWordStart) {
+						crosswordField[i][j] = wordIndex;
+						wordIndex++;
+					}
+				}
+			}
+		}
+	}
+	
 	private boolean getFinalState(Map<WordIdentifier, WordState> wordStateMap)
 			throws UnknownHostException, MongoException {
 		WordState wordState = null;
+		Map<WordState, List<Integer>> backtracksPerWordstate = new HashMap<WordState, List<Integer>>();
 		Deque<CrosswordState> crosswordStates = new LinkedList<CrosswordState>();
 		boolean[] preconditions = null;
 		do {
@@ -240,9 +322,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 				return true;
 			}
 
-			System.out.println("Processing "
-					+ wordState.getId().getWordNumber() + ", "
-					+ (wordState.getId().isAcross() ? "across" : "down"));
+			System.out.println("Processing " + getIdentifierString(wordState));
 			// get best word match (intelligent instantiation)
 
 			int bestWordIndex = getBestWordMatch(wordState, wordStateMap,
@@ -252,25 +332,73 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 				String word = wordProvider.getWord(wordState.getWordLength(),
 						bestWordIndex);
 				CrosswordState crosswordState = getCurrentState(wordStateMap,
-						wordState, word);
+						wordState, word, bestWordIndex);
 				crosswordStates.addLast(crosswordState);
-				
+
 				changeCurrentState(wordStateMap, wordState, bestWordIndex, word);
 				wordState = null;
 			} else {
+				backtracksPerWordstate
+						.put(wordState, new LinkedList<Integer>());
 				CrosswordState crosswordState;
+				List<Integer> backtracksTries;
 				List<CrosswordState> backtrackedStates = new LinkedList<CrosswordState>();
 				do {
 					System.out.println("Backtracking");
 					crosswordState = crosswordStates.removeLast();
 					backtrackedStates.add(crosswordState);
 					revertState(wordStateMap, crosswordState);
+					backtracksTries = backtracksPerWordstate
+							.put(crosswordState.wordState,
+									new LinkedList<Integer>());
 				} while (getCrossedIndex(wordState, crosswordState.wordState) == -1);
-				preconditions = getPreconditions(backtrackedStates, wordState);
+
+				if (backtracksTries == null) {
+					backtracksTries = new LinkedList<Integer>();
+				}
+
+				boolean calculatePreconditions = true;
+				while (backtracksTries.size() == 5) {
+					calculatePreconditions = false;
+					backtracksPerWordstate.put(crosswordState.wordState,
+							new LinkedList<Integer>());
+					crosswordState = crosswordStates.removeLast();
+					revertState(wordStateMap, crosswordState);
+					backtracksTries = backtracksPerWordstate
+							.get(crosswordState.wordState);
+					if (backtracksTries == null) {
+						backtracksTries = new LinkedList<Integer>();
+					}
+					System.out
+							.println("Backtrack count exceeded. Backtracking to "
+									+ getIdentifierString(crosswordState.wordState)
+									+ " - number of backtracks: "
+									+ backtracksTries);
+				}
+				backtracksTries.add(crosswordState.wordIndex);
+				backtracksPerWordstate.put(crosswordState.wordState,
+						backtracksTries);
+				// backtracksPerWordstate.put(crosswordState.wordState,
+				// backtracksTries + 1);
+				if (calculatePreconditions) {
+					preconditions = getPreconditions(backtrackedStates,
+							wordState);
+				} else {
+					preconditions = new boolean[crosswordState.wordState
+							.getAvailableWords().length];
+					for (int i = 0; i < backtracksTries.size(); i++) {
+						preconditions[backtracksTries.get(i)] = true;
+					}
+				}
 				wordState = crosswordState.wordState;
 			}
-		} while (!crosswordStates.isEmpty());
-		return false;
+		} while (true);
+		// return false;
+	}
+
+	private String getIdentifierString(WordState wordState) {
+		return wordState.getId().getWordNumber() + ", "
+				+ (wordState.getId().isAcross() ? "across" : "down");
 	}
 
 	private boolean[] getPreconditions(List<CrosswordState> backtrackedStates,
@@ -343,7 +471,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 
 	private void changeCurrentState(
 			Map<WordIdentifier, WordState> wordStateMap, WordState wordState,
-			int bestWordIndex, String word) throws UnknownHostException, MongoException {
+			int bestWordIndex, String word) throws UnknownHostException,
+			MongoException {
 
 		System.out.println("Chose : " + word);
 
@@ -355,16 +484,20 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		}
 		wordState.setAvailableWords(availableWords);
 		wordState.setWord(word);
-		
+
 		// change crossed states
 		for (int i = 0; i < wordState.getCrossedWords().size(); i++) {
 			Entry<WordIdentifier, Integer> crossedWordEntry = wordState
 					.getCrossedWords().get(i);
 			if (crossedWordEntry == null) {
 				continue;
-			}// TODO if is processed dont do that
+			}
 			WordState crossedWordState = wordStateMap.get(crossedWordEntry
 					.getKey());
+// 			TODO if is processed dont do that
+//			if(crossedWordState.isProcessed()) {
+//				continue;
+//			}
 			boolean[] crossedState = crossedWordState.getAvailableWords();
 			wordProvider.intersect(crossedState,
 					crossedWordState.getWordLength(),
@@ -380,7 +513,8 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	}
 
 	private CrosswordState getCurrentState(
-			Map<WordIdentifier, WordState> wordStateMap, WordState wordState, String word) {
+			Map<WordIdentifier, WordState> wordStateMap, WordState wordState,
+			String word, int wordIndex) {
 		boolean[] oldAvailableWords = wordState.getAvailableWords().clone();
 		boolean[][] oldCrossedWordStates = new boolean[wordState
 				.getWordLength()][wordState.getAvailableWords().length];
@@ -401,6 +535,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		crosswordState.oldCrossedWordStates = oldCrossedWordStates;
 		crosswordState.wordState = wordState;
 		crosswordState.word = word;
+		crosswordState.wordIndex = wordIndex;
 		return crosswordState;
 	}
 
@@ -413,45 +548,47 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 
 		printCrossword(cols, rows, crosswordField);
 
-		// Fills array with word indexes.
-		// Calculates on which index there is a word's start.
-		int wordIndex = 1;
-		// gridnum, row, col
 		List<int[]> acrossWords = new ArrayList<int[]>();
 		List<int[]> downWords = new ArrayList<int[]>();
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (crosswordField[i][j] != -1) {
-					boolean isWordStart = false;
-					if ((i == 0) || (crosswordField[i - 1][j] == -1)) {
-						int k = 0;
-						while ((k + i) < rows && crosswordField[i + k][j] != -1) {
-							k++;
-						}
-						if (k > 2) {
-							downWords.add(new int[] { wordIndex, i, j });
-							isWordStart = true;
-						}
-					}
-
-					if ((j == 0) || (crosswordField[i][j - 1] == -1)) {
-						int k = 0;
-						while ((j + k) < cols && crosswordField[i][j + k] != -1) {
-							k++;
-						}
-						if (k > 2) {
-							acrossWords.add(new int[] { wordIndex, i, j });
-							isWordStart = true;
-						}
-					}
-
-					if (isWordStart) {
-						crosswordField[i][j] = wordIndex;
-						wordIndex++;
-					}
-				}
-			}
-		}
+		createStartingGrid(crosswordField, acrossWords, downWords);
+		
+//		// Fills array with word indexes.
+//		// Calculates on which index there is a word's start.
+//		int wordIndex = 1;
+//		// gridnum, row, col
+//		for (int i = 0; i < rows; i++) {
+//			for (int j = 0; j < cols; j++) {
+//				if (crosswordField[i][j] != -1) {
+//					boolean isWordStart = false;
+//					if ((i == 0) || (crosswordField[i - 1][j] == -1)) {
+//						int k = 0;
+//						while ((k + i) < rows && crosswordField[i + k][j] != -1) {
+//							k++;
+//						}
+//						if (k > 2) {
+//							downWords.add(new int[] { wordIndex, i, j });
+//							isWordStart = true;
+//						}
+//					}
+//
+//					if ((j == 0) || (crosswordField[i][j - 1] == -1)) {
+//						int k = 0;
+//						while ((j + k) < cols && crosswordField[i][j + k] != -1) {
+//							k++;
+//						}
+//						if (k > 2) {
+//							acrossWords.add(new int[] { wordIndex, i, j });
+//							isWordStart = true;
+//						}
+//					}
+//
+//					if (isWordStart) {
+//						crosswordField[i][j] = wordIndex;
+//						wordIndex++;
+//					}
+//				}
+//			}
+//		}
 
 		printCrossword(cols, rows, crosswordField);
 
@@ -536,10 +673,15 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	private void printCrossword(int cols, int rows, int[][] crosswordField) {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				System.out.print(crosswordField[i][j] + " ");
+				// logger.info(crosswordField[i][j] + " ");
+				System.out.print((crosswordField[i][j] >= 0 ? " " : "")
+						+ (crosswordField[i][j] < 10 ? " " : "")
+						+ crosswordField[i][j] + " ");
 			}
+			// logger.info("\n");
 			System.out.println();
 		}
+		// logger.info("\n");
 		System.out.println();
 	}
 
