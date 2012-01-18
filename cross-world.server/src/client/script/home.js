@@ -42,11 +42,20 @@ function showWaitTab() {
 }
 
 function showCrosswordTab(crossword) {
-	var $crosswordContainer = $("#generatedCrosswordTab .crosswordContainer").empty();
+	var $crosswordContainer = $("#generatedCrosswordTab .crosswordContainer").empty(),
+		$acrossCluesContainer = $("#generatedCrosswordTab .acrossClues").empty(),
+		$downCluesContainer = $("#generatedCrosswordTab .downClues").empty(),
+		compare = function (a, b) {
+			return parseInt(a, 10) - parseInt(b, 10);
+		};
 	$("#crosswordTabs").tabs("option", "disabled", [0, 1]);
 	$("#crosswordTabs").tabs("option", "selected", 2);
-	$("#crosswordTabs").tabs("option", "disabled", [0, 1, 2]);
+	$("#crosswordTabs").tabs("option", "disabled", [1, 2]);
 	showCrossword(crossword, $crosswordContainer);
+	crossword.cluesDown.sort(compare);
+	crossword.cluesAcross.sort(compare);
+	showClues(crossword, $acrossCluesContainer, $downCluesContainer);
+	$("#generatedCrosswordTab #backButton").button();
 	$("#generatedCrosswordTab #backButton").on("click", function (e) {
 		showCrosswordTemplatesTab();
 	});
@@ -74,7 +83,6 @@ function retrieveCrossword(crosswordTemplate) {
 			blankCells: blankCells
 		},
 		success: function (crossword) {
-			console.log(crossword);
 			deferred.resolve(crossword);
 		},
 		error: function (jqXHR, textStatus) {
@@ -103,4 +111,21 @@ function showCrossword(crossword, $element) {
 	
 	//Fix element height.
 	$element.append(CW.Templates.crossword.clearfix);
+}
+
+function showClues(crossword, $acrossContainer, $downContainer) {
+	var i;
+	
+	for(i = 0; i < crossword.cluesAcross.length; i++) {
+		$(Mustache.to_html(CW.Templates.crossword.clue, {
+			clue: crossword.cluesAcross[i]
+		}))
+		.appendTo($acrossContainer);
+	}
+	for(i = 0; i < crossword.cluesDown.length; i++) {
+		$(Mustache.to_html(CW.Templates.crossword.clue, {
+			clue: crossword.cluesDown[i]
+		}))
+		.appendTo($downContainer);
+	}
 }

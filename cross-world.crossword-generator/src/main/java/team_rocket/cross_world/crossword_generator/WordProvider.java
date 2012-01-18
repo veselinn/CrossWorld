@@ -60,11 +60,15 @@ public class WordProvider {
 		return dictionary.getWordMapping(0, 0).length;
 	}
 
-	private WordDictionary getStoredDictionary(int wordLength) throws UnknownHostException, MongoException {
+	public void initialize() throws UnknownHostException, MongoException {
 		if(!isInitialized) {
 			wordDictinaries = dictionaryCreator.getDictionaries();
 			isInitialized = true;
 		}
+	}
+	
+	private WordDictionary getStoredDictionary(int wordLength) throws UnknownHostException, MongoException {
+		initialize();
 		return wordDictinaries.get(wordLength);
 	}
 }

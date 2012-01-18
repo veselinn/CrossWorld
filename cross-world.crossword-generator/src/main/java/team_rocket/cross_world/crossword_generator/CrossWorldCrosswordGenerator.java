@@ -76,8 +76,11 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 		Map<WordIdentifier, WordState> initialState = generateStartingState(
 				cols, rows, blanks);
 		Map<WordIdentifier, WordState> crossword = generateCrossword(initialState);
-		printState(crossword);
-		return CrosswordConverter.convertCrossword(wordProvider, blanks, rows, cols, crossword);
+		if (crossword != null) {
+			printState(crossword);
+			return CrosswordConverter.convertCrossword(wordProvider, blanks, rows, cols, crossword);
+		}
+		return null;
 	}
 
 	private void printState(Map<WordIdentifier, WordState> state)
@@ -106,13 +109,13 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 			Map<WordIdentifier, WordState> initialState)
 			throws UnknownHostException, MongoException {
 		// WordState errorState = getNextState(initialState);
-		boolean result = getFinalState(initialState);
-		if (!result) {
-			System.out.println("Error! Better luck next time.");
-			System.exit(1);
-		}
-		System.out.println("Everything should be alright.");
-		return initialState;
+		boolean success = getFinalState(initialState);
+		if (success) {
+			System.out.println("Everything should be alright.");
+			return initialState;
+		} 
+		System.out.println("Error! Better luck next time.");
+		return null;
 	}
 
 	/**

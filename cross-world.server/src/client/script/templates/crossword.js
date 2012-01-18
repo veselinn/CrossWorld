@@ -13,5 +13,8 @@ CW.Templates.crossword = {
 			'	<div class="fullCell">{{letter}}</div>' +
 			'	{{/blank}}' +
 			'</div>',
+	clue:	'<div class="clue">' +
+			'{{clue}}' +
+			'</div>',
 	clearfix: '<div style="clear: both;">'
 }

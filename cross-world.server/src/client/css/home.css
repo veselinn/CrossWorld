@@ -1,9 +1,8 @@
 .pageContainer {
-	border: 1px solid blue;
 	margin: 20px auto;
 	padding: 20px 10px;
 	
-	width: 600px;
+	max-width: 1000px;
 	
 	font: 12px Verdana;
 	overflow: visible;
@@ -11,7 +10,7 @@
 
 #crosswordTemplatesTab .crosswordsContainer {
 	margin-top: 20px;
-	border: 1px solid green;
+	border: 1px solid #c8c8c8;
 	
 	height: 500px;
 	overflow-x: hidden;
@@ -28,7 +27,7 @@
 
 .hovered {
 	box-shadow: 0 0 3px 3px #888;
-	background-color: #e6ffe1;	
+	background-color: #e0ffce;	
 }
 
 .loader {
@@ -40,6 +39,40 @@
 
 #generatedCrosswordTab .crosswordContainer {
 	margin: 0 auto;
+}
+
+.clearfix {
+	clear: both;
+}
+
+.cluesContainer {
+	float: left;
+	width: 30%;
+	background-color: #dedede;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+.cluesContainer span {
+	margin-left: 10px;
+	font-size: 14px;
+	font-weight: bolder;	
+}
+
+.cluesContainer div:first-child {
+	border-top: 1px solid #9f9f9f;
+}
+
+.acrossCluesContainer {
+	margin-left: 17%;	
+}
+
+.downCluesContainer {
+	margin-left: 6%;
+}
+
+#backButton {
+	margin: 10px 17%;
 }
 
 html, page {

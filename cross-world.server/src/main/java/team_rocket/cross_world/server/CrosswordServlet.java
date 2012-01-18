@@ -1,11 +1,14 @@
 package team_rocket.cross_world.server;
 
 import java.io.*;
+import java.net.UnknownHostException;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 import org.codehaus.jackson.map.ObjectMapper;
+
+import com.mongodb.MongoException;
 
 import team_rocket.cross_world.commons.data.Crossword;
 import team_rocket.cross_world.crossword_generator.CrossWorldCrosswordGenerator;
@@ -23,8 +26,16 @@ public class CrosswordServlet extends HttpServlet
 
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		crosswordGenerator = new CrossWorldCrosswordGenerator(
-				new WordProvider(new WordDictionaryCreator()));
+		WordProvider wordProvider = new WordProvider(new WordDictionaryCreator());
+			try {
+				wordProvider.initialize();
+			} catch (UnknownHostException e) {
+				throw new ServletException("Failed to initialize word provider.");
+			} catch (MongoException e) {
+				throw new ServletException("Failed to initialize word provider.");
+			}
+		
+		crosswordGenerator = new CrossWorldCrosswordGenerator(wordProvider);
 	}
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -38,17 +49,23 @@ public class CrosswordServlet extends HttpServlet
 		
 		int rows = Integer.parseInt(req.getParameter("rows"));
 		int cols = Integer.parseInt(req.getParameter("cols"));
-		Crossword crossworld;
+		Writer writer = resp.getWriter();
+		Crossword crossword;
 		try {
-			crossworld = crosswordGenerator.generateCrossword(cols, rows, blankCells);
-			resp.addHeader("Content-Type", "application/json");
-			ObjectMapper mapper = new ObjectMapper();
-			Writer writer = resp.getWriter();
-			writer.write(mapper.writeValueAsString(crossworld));
-			
-			resp.setStatus(200);
+			crossword = crosswordGenerator.generateCrossword(cols, rows, blankCells);
+			if (crossword != null) {
+				resp.addHeader("Content-Type", "application/json");
+				ObjectMapper mapper = new ObjectMapper();
+				writer.write(mapper.writeValueAsString(crossword));				
+				resp.setStatus(200);
+			} else {
+				writer.write("Failed to generate crossword.");
+				resp.setStatus(500);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			
+			writer.write("Error while generating crossword.");
 			resp.setStatus(500);
 		}    	
     }
