@@ -31,6 +31,11 @@
     	<version>1.0.0</version>
     </dependency>
 	<dependency>
+    	<groupId>team-rocket</groupId>
+    	<artifactId>cross-world.crossword-generator</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+	<dependency>
 		<groupId>org.eclipse.jetty</groupId>
 		<artifactId>jetty-server</artifactId>
 		<version>8.0.0.M3</version>

@@ -50,15 +50,15 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 //				110,
 //				123
 //		});
-		cwcg.generateCrossword(13, 13, new int[] {
-				4, 17, 30, 134, 147, 160, 8, 21, 34, 138, 151, 164,
-				52, 53, 54, 62, 63, 64, 104, 105, 106, 114, 115, 116,
-				58,
-				70, 71, 72,
-				82, 83, 84, 85, 86, 
-				96, 97, 98,
-				110
-		});
+//		cwcg.generateCrossword(13, 13, new int[] {
+//				4, 17, 30, 134, 147, 160, 8, 21, 34, 138, 151, 164,
+//				52, 53, 54, 62, 63, 64, 104, 105, 106, 114, 115, 116,
+//				58,
+//				70, 71, 72,
+//				82, 83, 84, 85, 86, 
+//				96, 97, 98,
+//				110
+//		});
 
 	}
 
@@ -72,7 +72,7 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 				cols, rows, blanks);
 		Map<WordIdentifier, WordState> crossword = generateCrossword(initialState);
 		printState(crossword);
-		return null;
+		return CrosswordConverter.convertCrossword(wordProvider, blanks, rows, cols, crossword);
 	}
 
 	private void printState(Map<WordIdentifier, WordState> state)

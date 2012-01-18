@@ -67,12 +67,14 @@ function retrieveCrossword(crosswordTemplate) {
 		cache: "false",
 		url: "/crossword/",
 		contentType: "application/json",
+		dataType: "json",
 		data: {
 			rows: crosswordTemplate.rows,
 			cols: crosswordTemplate.cols,
 			blankCells: blankCells
 		},
 		success: function (crossword) {
+			console.log(crossword);
 			deferred.resolve(crossword);
 		},
 		error: function (jqXHR, textStatus) {
@@ -87,13 +89,17 @@ function retrieveCrossword(crosswordTemplate) {
 function showCrossword(crossword, $element) {
 	var i;
 	
-	$element.css("width", (crossword.cols * 22) + "px");
 	for (i = 0; i < crossword.grid.length; i++) {
-		$element.append(Mustache.to_html(CW.Templates.crossword.cell, {
+		$(Mustache.to_html(CW.Templates.crossword.cell, {
 			blank: crossword.grid[i] === '.',
-			letter: crossword.grid[i]
+			letter: crossword.grid[i],
+			cellNumber: crossword.gridNums && crossword.gridNums[i]
 		}))
+		.css("width", crossword.gridNums ? 35 : 20)
+		.css("height", crossword.gridNums ? 35 : 20)
+		.appendTo($element);
 	}
+	$element.css("width", (crossword.cols * $element.find("div").outerWidth()) + "px");
 	
 	//Fix element height.
 	$element.append(CW.Templates.crossword.clearfix);

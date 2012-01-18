@@ -7,8 +7,6 @@ public class Crossword {
 	private int[] gridNums;
 	private String[] cluesAcross;
 	private String[] cluesDown;
-	private String[] answersAcross;
-	private String[] answersDown;
 	
 	public int getCols() {
 		return cols;
@@ -46,17 +44,4 @@ public class Crossword {
 	public void setCluesDown(String[] cluesDown) {
 		this.cluesDown = cluesDown;
 	}
-	public String[] getAnswersAcross() {
-		return answersAcross;
-	}
-	public void setAnswersAcross(String[] answersAcross) {
-		this.answersAcross = answersAcross;
-	}
-	public String[] getAnswersDown() {
-		return answersDown;
-	}
-	public void setAnswersDown(String[] answersDown) {
-		this.answersDown = answersDown;
-	}
-
 }

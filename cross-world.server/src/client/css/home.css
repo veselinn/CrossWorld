@@ -1,10 +1,9 @@
 .pageContainer {
 	border: 1px solid blue;
-	margin: 50px auto;
+	margin: 20px auto;
 	padding: 20px 10px;
 	
-	width: 550px;
-	height: 700px;
+	width: 600px;
 	
 	font: 12px Verdana;
 	overflow: visible;
@@ -28,7 +27,7 @@
 }
 
 .hovered {
-	box-shadow: 0 0 2px 2px #888;
+	box-shadow: 0 0 3px 3px #888;
 	background-color: #e6ffe1;	
 }
 
