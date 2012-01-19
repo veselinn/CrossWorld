@@ -1,4 +1,4 @@
-package team_rocket.cross_world.crossword_generator;
+package team_rocket.cross_world.crossword_generator.algorithm;
 
 import java.net.UnknownHostException;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -15,13 +15,16 @@ import java.util.Random;
 import java.util.Set;
 
 import team_rocket.cross_world.commons.data.Crossword;
+import team_rocket.cross_world.crossword_generator.data.CrosswordState;
+import team_rocket.cross_world.crossword_generator.data.WordIdentifier;
+import team_rocket.cross_world.crossword_generator.data.WordState;
+import team_rocket.cross_world.crossword_generator.util.CrosswordConverter;
+import team_rocket.cross_world.crossword_generator.util.WordDictionaryCreator;
+import team_rocket.cross_world.crossword_generator.util.WordProvider;
 
 import com.mongodb.MongoException;
 
 public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
-
-	// private static Logger logger = Logger
-	// .getLogger(CrossWorldCrosswordGenerator.class);
 
 	private static final int MIN_WORD_LENGTH = 2;
 	private static final int MAX_TRIES_PER_WORDSTATE = 7;
@@ -30,10 +33,6 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	private WordProvider wordProvider;
 
 	public static void main(String[] args) throws Exception {
-		// BasicConfigurator.configure();
-		// logger.addAppender(new FileAppender(new SimpleLayout(),
-		// "/crossword-generator.log"));
-		// logger.addAppender(new ConsoleAppender(new SimpleLayout()));
 
 		CrossWorldCrosswordGenerator cwcg = new CrossWorldCrosswordGenerator(
 				new WordProvider(new WordDictionaryCreator()));
@@ -108,7 +107,6 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	private Map<WordIdentifier, WordState> generateCrossword(
 			Map<WordIdentifier, WordState> initialState)
 			throws UnknownHostException, MongoException {
-		// WordState errorState = getNextState(initialState);
 		boolean success = getFinalState(initialState);
 		if (success) {
 			System.out.println("Everything should be alright.");
@@ -393,8 +391,6 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 				backtracksTries.add(crosswordState.wordIndex);
 				backtracksPerWordstate.put(crosswordState.wordState,
 						backtracksTries);
-				// backtracksPerWordstate.put(crosswordState.wordState,
-				// backtracksTries + 1);
 				if (calculatePreconditions) {
 					preconditions = getPreconditions(backtrackedStates,
 							wordState);
@@ -408,7 +404,6 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 				wordState = crosswordState.wordState;
 			}
 		} while (true);
-		// return false;
 	}
 
 	private String getIdentifierString(WordState wordState) {
@@ -649,15 +644,12 @@ public class CrossWorldCrosswordGenerator implements CrosswordGenerator {
 	private void printCrossword(int cols, int rows, int[][] crosswordField) {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				// logger.info(crosswordField[i][j] + " ");
 				System.out.print((crosswordField[i][j] >= 0 ? " " : "")
 						+ (crosswordField[i][j] < 10 ? " " : "")
 						+ crosswordField[i][j] + " ");
 			}
-			// logger.info("\n");
 			System.out.println();
 		}
-		// logger.info("\n");
 		System.out.println();
 	}
 

@@ -1,4 +1,4 @@
-package team_rocket.cross_world.crossword_generator;
+package team_rocket.cross_world.crossword_generator.algorithm;
 
 import team_rocket.cross_world.commons.data.Crossword;
 

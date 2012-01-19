@@ -11,10 +11,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import com.mongodb.MongoException;
 
 import team_rocket.cross_world.commons.data.Crossword;
-import team_rocket.cross_world.crossword_generator.CrossWorldCrosswordGenerator;
-import team_rocket.cross_world.crossword_generator.CrosswordGenerator;
-import team_rocket.cross_world.crossword_generator.WordDictionaryCreator;
-import team_rocket.cross_world.crossword_generator.WordProvider;
+import team_rocket.cross_world.crossword_generator.algorithm.CrossWorldCrosswordGenerator;
+import team_rocket.cross_world.crossword_generator.algorithm.CrosswordGenerator;
+import team_rocket.cross_world.crossword_generator.util.WordDictionaryCreator;
+import team_rocket.cross_world.crossword_generator.util.WordProvider;
 
 /**
  * A servlet responsible for serving crosswords.

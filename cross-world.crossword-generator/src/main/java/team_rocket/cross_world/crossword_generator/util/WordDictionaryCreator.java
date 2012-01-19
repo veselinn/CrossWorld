@@ -1,4 +1,4 @@
-package team_rocket.cross_world.crossword_generator;
+package team_rocket.cross_world.crossword_generator.util;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import team_rocket.cross_world.commons.data.WordDictionary;
+import team_rocket.cross_world.crossword_generator.data.WordDictionary;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -21,22 +21,6 @@ import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
 public class WordDictionaryCreator {
 	private DBCollection mWordsCollection;
 	private boolean dbInitialized;
-	
-	public static void main(String[] args) throws UnknownHostException,
-			MongoException {
-		WordDictionaryCreator wdc = new WordDictionaryCreator();
-		Map<Integer, WordDictionary> dictionaries = wdc.getDictionaries();
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 26; j++) {
-				if(dictionaries.get(4).getWordMapping(i, j)[123] == true) {
-					char currentCh = (char) ('a' + j);
-					System.out.println("letter " + currentCh);
-				}
-			}
-		}
-
-		System.out.println(dictionaries.get(4).getWordMapping(0, 0).length);
-	}
 
 	public Map<Integer, WordDictionary> getDictionaries() throws UnknownHostException, MongoException {
 		if(!dbInitialized) {

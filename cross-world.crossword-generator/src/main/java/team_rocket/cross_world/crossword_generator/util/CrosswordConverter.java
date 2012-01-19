@@ -1,4 +1,4 @@
-package team_rocket.cross_world.crossword_generator;
+package team_rocket.cross_world.crossword_generator.util;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -18,6 +18,9 @@ import com.mongodb.Mongo;
 
 import static team_rocket.cross_world.commons.constants.Constants.Mongo.*;
 import team_rocket.cross_world.commons.data.Crossword;
+import team_rocket.cross_world.crossword_generator.algorithm.CrossWorldCrosswordGenerator;
+import team_rocket.cross_world.crossword_generator.data.WordIdentifier;
+import team_rocket.cross_world.crossword_generator.data.WordState;
 
 public class CrosswordConverter {
 	

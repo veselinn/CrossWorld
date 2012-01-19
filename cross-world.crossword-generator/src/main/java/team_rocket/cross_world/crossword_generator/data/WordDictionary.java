@@ -1,4 +1,4 @@
-package team_rocket.cross_world.commons.data;
+package team_rocket.cross_world.crossword_generator.data;
 
 public class WordDictionary {
 	private int wordLength;

@@ -1,4 +1,4 @@
-package team_rocket.cross_world.crossword_generator;
+package team_rocket.cross_world.crossword_generator.util;
 
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.mongodb.MongoException;
 
-import team_rocket.cross_world.commons.data.WordDictionary;
+import team_rocket.cross_world.crossword_generator.data.WordDictionary;
 
 import static team_rocket.cross_world.commons.constants.Constants.ALPHABET_SIZE;
 
